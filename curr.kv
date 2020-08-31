@@ -1,0 +1,79 @@
+#:import MDLabel kivymd.uix.label.MDLabel
+#:import MDTextField kivymd.uix.textfield.MDTextField
+#:import MDRaisedButton kivymd.uix.button.MDRaisedButton
+
+<ItemLabel@MDLabel>
+    font_size: '25sp'
+    halign: 'left'
+    valign: 'middle'
+    text_size: self.size
+
+<ItemMDRaisedButton@MDRaisedButton>
+    size_hint: 1, .9
+    font_size: '20sp'
+
+<Container>
+    rows: 3
+    eur:eur
+    usd:usd
+    rub:rub
+    text_input:text_input
+
+    AnchorLayout:
+        anchor_y: 'top'
+        size_hint: 1, .2
+        padding: 30
+        MDTextField:
+            id: text_input
+            font_size: '45sp'
+            multiline: False
+            input_type: 'number'
+            input_filter: 'int'
+            hint_text: 'amount of money '
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: .9, .15
+        padding: [30,0,30,20]
+        ItemMDRaisedButton:
+            text: 'USD'
+            on_release:
+                root.calculate('USD')
+        ItemMDRaisedButton:
+            text: 'EUR'
+            on_release:
+                root.calculate('EUR')
+        ItemMDRaisedButton:
+            text: 'RUB'
+            on_release:
+                root.calculate('RUB')
+
+
+    GridLayout:
+        cols: 2
+
+        BoxLayout:
+            orientation: 'vertical'
+            padding: [30,0,0,0]
+            ItemLabel:
+                text: 'USD'
+            ItemLabel:
+                text: 'EUR'
+            ItemLabel:
+                text: 'RUB'
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: .5, 1
+            ItemLabel:
+                id: usd
+                text: '0'
+            ItemLabel:
+                id: eur
+                text: '0'
+            ItemLabel:
+                id: rub
+                text: '0'
+
+
+
