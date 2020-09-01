@@ -1,8 +1,8 @@
 .buildozer/*
 .buildozer
 bin
-config.log
-curr.ini
+*.log
+*.ini
 .coverage
 .noseids
 Kivy.egg-info

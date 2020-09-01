@@ -21,30 +21,28 @@ Config.set('kivy', 'keyboard_mode', 'systemanddock')
 #from kivy.core.window import Window
 #Window.size = (480, 853)
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 def get_rates():
-    url = 'https://openexchangerates.org//api/latest.json?app_id=43d720b184b24b0d8157da339f12f17c'
+    url = 'https://openexchangerates.org/api/latest.json?app_id=43d720b184b24b0d8157da339f12f17c'
     response = requests.get(url)
-
     Logger.info('response status code: {}'.format(response.status_code))
     data = response.json()
-    ##t = time.strftime('%d/%m %H:%M:%S', time.localtime(data['timestamp']))
-    usdrub = float(data['rates']['RUB'])
-    eurrub = float(data['rates']['RUB']) / float(data['rates']['EUR'])
     return data['rates']
 
 
 class Container(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.app = None
+        self.app = MDApp.get_running_app()
+        self.curr1.text, self.curr2.text = ast.literal_eval(self.app.config.get(
+            'General', 'currencies'))
 
     def calculate(self):
-        self.app = MDApp.get_running_app()
+        #self.app =
         self.app.user_data = ast.literal_eval(
             self.app.config.get('General', 'user_data'))
-        if 'update' in self.app.user_data.keys() and (time.time() - self.app.user_data['update'] < 120):
+        if 'update' in self.app.user_data.keys() and (time.time() - self.app.user_data['update'] < 1800):
             rates = self.app.user_data['rates']
         else:
             try:
@@ -66,6 +64,8 @@ class Container(GridLayout):
         else:
             fmt = "{:.2f}"
         self.amount2.text = fmt.format(amount1*k)
+        self.app.config.set('General', 'currencies', [self.curr1.text, self.curr2.text])
+        self.app.config.write()
 
     def swap_currencies(self):
         self.curr1.text, self.curr2.text = self.curr2.text, self.curr1.text
@@ -90,15 +90,18 @@ class CurrApp(MDApp):
     def __init__(self, **kvargs):
         super(CurrApp, self).__init__(**kvargs)
         self.config = ConfigParser()
+        print(self.config)
 
     def build_config(self, config):
         config.adddefaultsection('General')
         config.setdefault('General', 'user_data', '{}')
+        config.setdefault('General', 'currencies', '["USD","RUB"]')
 
     def set_value_from_config(self):
         self.config.read(os.path.join(self.directory, '%(appname)s.ini'))
         self.user_data = ast.literal_eval(self.config.get(
             'General', 'user_data'))
+
 
     def get_application_config(self):
         return super(CurrApp, self).get_application_config(
