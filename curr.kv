@@ -1,79 +1,124 @@
 #:import MDLabel kivymd.uix.label.MDLabel
 #:import MDTextField kivymd.uix.textfield.MDTextField
 #:import MDRaisedButton kivymd.uix.button.MDRaisedButton
-
+#:import MDDropdownMenu kivymd.uix.menu.MDDropdownMenu
+#:import MDFillRoundFlatButton kivymd.uix.button.MDFillRoundFlatButton
 <ItemLabel@MDLabel>
     font_size: '25sp'
     halign: 'left'
     valign: 'middle'
     text_size: self.size
 
-<ItemMDRaisedButton@MDRaisedButton>
-    size_hint: 1, .9
-
+<NumButton@MDFillRoundFlatButton>
+    size_hint: .8, .8
+    font_size: '25sp'
+<CurSpinner@Spinner>
+    size_hint: [.6,1]
+    values:'USD','EUR','GBP','RUB','CHF','CAD','JPY','BTC'
+    background_normal: ''
+    background_color: app.theme_cls.primary_color
 
 <Container>
-    rows: 3
-    eur:eur
-    usd:usd
-    rub:rub
-    text_input:text_input
+    rows: 4
 
-    AnchorLayout:
-        anchor_y: 'top'
-        size_hint: 1, .2
-        padding: 30
-        MDTextField:
-            id: text_input
-            font_size: '45sp'
-            multiline: False
-            input_type: 'number'
-            input_filter: 'int'
-            hint_text: 'amount of money '
+    amount1:amount1
+    amount2:amount2
+    curr1:curr1
+    curr2:curr2
 
     BoxLayout:
-        orientation: 'horizontal'
-        size_hint: .9, .15
-        padding: [30,0,30,20]
-        ItemMDRaisedButton:
-            text: 'USD'
+        size_hint: [.9,.2]
+        padding: [30,30,30,0]
+        spacing:5
+        ItemLabel:
+            id:amount1
+            text:'0'
+            halign: 'right'
+        CurSpinner:
+            id:curr1
+            text:'USD'
+            on_text:
+                root.calculate()
+    BoxLayout:
+        size_hint: [.9,.1]
+        padding: [30,0,30,0]
+        spacing: 1
+        ItemLabel:
+            text:'='
+            halign: 'right'
+        MDIconButton:
+            size_hint: [.6,1]
+            icon: 'arrow-up-down-bold-outline'
+            halign: 'center'
             on_release:
-                root.calculate('USD')
-        ItemMDRaisedButton:
-            text: 'EUR'
-            on_release:
-                root.calculate('EUR')
-        ItemMDRaisedButton:
-            text: 'RUB'
-            on_release:
-                root.calculate('RUB')
+                root.swap_currencies()
+    BoxLayout:
+        size_hint: [.9,.2]
+        padding: [30,0,30,30]
+        spacing:5
+        ItemLabel:
+            id:amount2
+            text:'0'
+            halign: 'right'
+        CurSpinner:
+            id:curr2
+            text:'RUB'
+            on_text:
+                root.calculate()
+
+
 
 
     GridLayout:
-        cols: 2
-
-        BoxLayout:
-            orientation: 'vertical'
-            padding: [30,0,0,0]
-            ItemLabel:
-                text: 'USD'
-            ItemLabel:
-                text: 'EUR'
-            ItemLabel:
-                text: 'RUB'
-
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint: .9, 1
-            ItemLabel:
-                id: usd
-                text: '0'
-            ItemLabel:
-                id: eur
-                text: '0'
-            ItemLabel:
-                id: rub
-                text: '0'
-
-
-
+        padding: 30
+        cols: 3
+        rows: 4
+        spacing:10
+        NumButton:
+            text: '7'
+            on_release:
+                root.input(7)
+        NumButton:
+            text: '8'
+            on_release:
+                root.input(8)
+        NumButton:
+            text: '9'
+            on_release:
+                root.input(9)
+        NumButton:
+            text: '4'
+            on_release:
+                root.input(4)
+        NumButton:
+            text: '5'
+            on_release:
+                root.input(5)
+        NumButton:
+            text: '6'
+            on_release:
+                root.input(6)
+        NumButton:
+            text: '1'
+            on_release:
+                root.input(1)
+        NumButton:
+            text: '2'
+            on_release:
+                root.input(2)
+        NumButton:
+            text: '3'
+            on_release:
+                root.input(3)
+        NumButton:
+            text: '0'
+            on_release:
+                root.input(0)
+        NumButton:
+            text: '.'
+            on_release:
+                root.input('.')
+        NumButton:
+            text: 'C'
+            on_release:
+                root.input('C')
