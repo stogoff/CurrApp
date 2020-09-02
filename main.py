@@ -13,7 +13,7 @@ import re
 os.environ['SSL_CERT_FILE'] = certifi.where()
 # from kivy.core.window import Window
 # Window.size = (480, 853)
-__version__ = '0.3.9'
+__version__ = '0.3.10'
 
 
 def get_rates():
@@ -42,17 +42,18 @@ class Main(GridLayout):
             self.app.user_data['rates'] = self.rates
             self.app.config.set('General', 'user_data', self.app.user_data)
             self.app.config.write()
+        else:
+            self.rates = self.app.user_data['rates']
         self.timelabel.text = time.strftime("rates updated: %d.%m.%Y, %H:%M:%S",
                                                 time.localtime(self.app.user_data['update']))
+        k = self.rates[self.curr2.text] / self.rates[self.curr1.text]
+        self.rate1.text = "{}/{}:{:.4f}".format(self.curr1.text,self.curr2.text,k)
+
+        self.rate2.text = "{}/{}:{:.4f}".format(self.curr2.text, self.curr1.text, 1/k)
 
     def calculate(self):
-        # self.app =
-        self.app.user_data = ast.literal_eval(
-            self.app.config.get('General', 'user_data'))
-        if 'update' in self.app.user_data.keys() and (time.time() - self.app.user_data['update'] < 1800):
-            self.rates = self.app.user_data['rates']
-        else:
-            self.update_rates()
+        self.update_rates()
+
         if re.match(r'.*[+\-*/].*',self.amount1.text):
             try:
                 amount1 = float(eval(self.amount1.text))
