@@ -1,27 +1,18 @@
 from kivy.uix.gridlayout import GridLayout
-from kivy.properties import ObjectProperty
-
-from kivy.config import Config, ConfigParser
+from kivy.config import  ConfigParser
 from kivymd.theming import ThemeManager
 from kivymd.app import MDApp
 from kivy.logger import Logger
 import requests
-import json
-import urllib.request
 import certifi
 import os
 import ast
 import time
 
-# Here's all the magic !
 os.environ['SSL_CERT_FILE'] = certifi.where()
-
-Config.set('kivy', 'keyboard_mode', 'systemanddock')
-
 #from kivy.core.window import Window
 #Window.size = (480, 853)
-
-__version__ = '0.3.3'
+__version__ = '0.3.7'
 
 def get_rates():
     url = 'https://openexchangerates.org/api/latest.json?app_id=43d720b184b24b0d8157da339f12f17c'
@@ -37,28 +28,37 @@ class Container(GridLayout):
         self.app = MDApp.get_running_app()
         self.curr1.text, self.curr2.text = ast.literal_eval(self.app.config.get(
             'General', 'currencies'))
+        self.rates = {}
+        self.update_rates()
+
+    def update_rates(self):
+        try:
+            self.rates = get_rates()
+            self.app.user_data['update'] = int(time.time())
+            self.app.user_data['rates'] = self.rates
+            self.app.config.set('General', 'user_data', self.app.user_data)
+            self.app.config.write()
+
+            self.timelabel.text = time.strftime("%d.%m.%Y, %H:%M:%S",
+                                                time.localtime(self.app.user_data['update']))
+
+        except:
+            rates = {}
+            Logger.exception('Something happened!')
 
     def calculate(self):
         #self.app =
         self.app.user_data = ast.literal_eval(
             self.app.config.get('General', 'user_data'))
         if 'update' in self.app.user_data.keys() and (time.time() - self.app.user_data['update'] < 1800):
-            rates = self.app.user_data['rates']
+            self.rates = self.app.user_data['rates']
         else:
-            try:
-                rates = get_rates()
-                self.app.user_data['update'] = int(time.time())
-                self.app.user_data['rates'] = rates
-                self.app.config.set('General', 'user_data', self.app.user_data)
-                self.app.config.write()
-            except:
-                rates = {}
-                Logger.exception('Something happened!')
+            self.update_rates()
         try:
             amount1 = float(self.amount1.text)
         except:
             amount1 = 0
-        k = rates[self.curr2.text]/rates[self.curr1.text]
+        k = self.rates[self.curr2.text]/self.rates[self.curr1.text]
         if self.curr2.text in ['BTC']:
             fmt = "{:.8f}"
         else:
@@ -90,6 +90,7 @@ class CurrApp(MDApp):
     def __init__(self, **kvargs):
         super(CurrApp, self).__init__(**kvargs)
         self.config = ConfigParser()
+        self.user_data = {}
         print(self.config)
 
     def build_config(self, config):

@@ -13,20 +13,26 @@
     size_hint: .8, .8
     font_size: '25sp'
 <CurSpinner@Spinner>
-    font_size: '15sp'
-    size_hint: [.6,1]
+    font_size: '20sp'
+    size_hint: [.4,1]
     values:'USD','EUR','GBP','RUB','CHF','CAD','JPY','BTC'
     background_normal: ''
     background_color: app.theme_cls.primary_color
 
 <Container>
-    rows: 4
+    rows: 5
 
     amount1:amount1
     amount2:amount2
     curr1:curr1
     curr2:curr2
-
+    timelabel:timelabel
+    AnchorLayout:
+        size_hint: [.9,.05]
+        MDLabel:
+            id:timelabel
+            text: '111'
+            halign: 'center'
     BoxLayout:
         size_hint: [.9,.2]
         padding: [30,30,30,0]
@@ -48,7 +54,7 @@
             text:'='
             halign: 'right'
         MDIconButton:
-            size_hint: [.6,1]
+            size_hint: [.4,1]
             icon: 'arrow-up-down-bold-outline'
             halign: 'center'
             on_release:
@@ -66,10 +72,6 @@
             text:'RUB'
             on_text:
                 root.calculate()
-
-
-
-
     GridLayout:
         padding: 30
         cols: 3
