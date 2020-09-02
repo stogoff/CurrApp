@@ -36,13 +36,13 @@ class Main(GridLayout):
         self.update_rates()
 
     def update_rates(self):
-        if 'update' in self.app.user_data.keys() and (time.time() - self.app.user_data['update'] > 1800):
+        if 'update' not in self.app.user_data.keys() or (time.time() - self.app.user_data['update'] > 1800):
             self.rates = get_rates()
             self.app.user_data['update'] = int(time.time())
             self.app.user_data['rates'] = self.rates
             self.app.config.set('General', 'user_data', self.app.user_data)
             self.app.config.write()
-        self.timelabel.text = time.strftime("%d.%m.%Y, %H:%M:%S",
+        self.timelabel.text = time.strftime("rates updated: %d.%m.%Y, %H:%M:%S",
                                                 time.localtime(self.app.user_data['update']))
 
     def calculate(self):
