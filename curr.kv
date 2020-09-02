@@ -8,20 +8,38 @@
     halign: 'left'
     valign: 'middle'
     text_size: self.size
+
+<MYRaisedButton>
+    md_bg_color: root.theme_cls.primary_color
+    theme_text_color: 'Custom'
+    text_color: root.specific_text_color
+
+<MYRaisedIconButton>
+    md_bg_color: root.theme_cls.primary_color
+    theme_text_color: 'Custom'
+    text_color: root.specific_text_color
+    elevation_normal: 10
+    MDIcon:
+        id: lbl_ic
+        icon: root.icon
+        theme_text_color: 'Custom'
+        text_color: [1,1,1,1]
+        size_hint_x: None
+        width: self.texture_size[0]
+
 <RateLabel@MDLabel>
-    #font_size: '15sp'
     halign: 'center'
     valign: 'middle'
     text_size: self.size
-<NumButton@MDRaisedButton>
+
+<NumButton@MYRaisedButton>
     elevation: 10
     size_hint: 1, 1
     font_size: '20sp'
 
-<IconButton@MDRaisedButton>
-    font_size: '20sp'
+<IconButton@MYRaisedIconButton>
     size_hint: 1, 1
-    pos_hint: {"center_x": .5}
+
 <CurSpinner@Spinner>
     font_size: '20sp'
     size_hint: [.4,1]
@@ -104,9 +122,11 @@
 
             on_release:
                 root.input('C')
-        NumButton:
-            text: '🔙'
-            font_name: 'NotoEmoji-Regular.ttf'
+        IconButton:
+            #text: '🔙'
+            #font_name: 'NotoEmoji-Regular.ttf'
+            icon: 'backspace'
+
             on_release:
                 root.input('B')
 

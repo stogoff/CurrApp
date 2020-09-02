@@ -1,3 +1,4 @@
+from kivy.properties import StringProperty, BooleanProperty
 from kivy.uix.gridlayout import GridLayout
 from kivy.config import ConfigParser
 from kivymd.theming import ThemeManager
@@ -9,6 +10,9 @@ import os
 import ast
 import time
 import re
+
+from kivymd.uix.behaviors import RectangularElevationBehavior
+from kivymd.uix.button import BaseFlatIconButton, BaseRectangularButton, BaseRaisedButton, BasePressedButton
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 # from kivy.core.window import Window
@@ -22,6 +26,36 @@ def get_rates():
     Logger.info('response status code: {}'.format(response.status_code))
     data = response.json()
     return data['rates']
+
+
+
+
+class MYRaisedButton(
+    BaseRectangularButton,
+    RectangularElevationBehavior,
+    BaseRaisedButton,
+    BasePressedButton,
+):
+    pass
+
+
+class MYRaisedIconButton(MYRaisedButton):
+    icon = StringProperty("android")
+    """
+    Button icon.
+
+    :attr:`icon` is an :class:`~kivy.properties.StringProperty`
+    and defaults to `'android'`.
+    """
+
+    text = StringProperty("")
+    """Button text.
+
+    :attr:`text` is an :class:`~kivy.properties.StringProperty`
+    and defaults to `''`.
+    """
+
+    button_label = BooleanProperty(False)
 
 
 class Main(GridLayout):
@@ -45,20 +79,20 @@ class Main(GridLayout):
         else:
             self.rates = self.app.user_data['rates']
         self.timelabel.text = time.strftime("rates updated: %d.%m.%Y, %H:%M:%S",
-                                                time.localtime(self.app.user_data['update']))
+                                            time.localtime(self.app.user_data['update']))
         k = self.rates[self.curr2.text] / self.rates[self.curr1.text]
-        self.rate1.text = "{}/{}:{:.4f}".format(self.curr1.text,self.curr2.text,k)
+        self.rate1.text = "{}/{}:\n{:.4f}".format(self.curr1.text, self.curr2.text, k)
 
-        self.rate2.text = "{}/{}:{:.4f}".format(self.curr2.text, self.curr1.text, 1/k)
+        self.rate2.text = "{}/{}:\n{:.4f}".format(self.curr2.text, self.curr1.text, 1 / k)
 
     def calculate(self):
         self.update_rates()
 
-        if re.match(r'.*[+\-*/].*',self.amount1.text):
+        if re.match(r'.*[+\-*/].*', self.amount1.text):
             try:
                 amount1 = float(eval(self.amount1.text))
             except:
-                amount1=0
+                amount1 = 0
         else:
             try:
                 amount1 = float(self.amount1.text)
@@ -97,12 +131,12 @@ class Main(GridLayout):
         self.calculate()
 
 
+
 class CurrApp(MDApp):
     theme_man = ThemeManager()
     title = "Currency calc"
 
     def __init__(self, **kwargs):
-
         self.config = ConfigParser()
         self.user_data = {}
         self.title = "Currency Calculator"
@@ -116,7 +150,6 @@ class CurrApp(MDApp):
 
     def set_value_from_config(self):
         self.config.read(os.path.join(self.directory, '%(appname)s.ini'))
-
 
     def get_application_config(self, **kwargs):
         return super(CurrApp, self).get_application_config(
