@@ -8,11 +8,12 @@ import certifi
 import os
 import ast
 import time
+import re
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 # from kivy.core.window import Window
 # Window.size = (480, 853)
-__version__ = '0.3.7'
+__version__ = '0.3.9'
 
 
 def get_rates():
@@ -23,27 +24,26 @@ def get_rates():
     return data['rates']
 
 
-class Container(GridLayout):
+class Main(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = MDApp.get_running_app()
         self.curr1.text, self.curr2.text = ast.literal_eval(self.app.config.get(
             'General', 'currencies'))
+        self.app.user_data = ast.literal_eval(self.app.config.get(
+            'General', 'user_data'))
         self.rates = {}
         self.update_rates()
 
     def update_rates(self):
-        try:
+        if 'update' in self.app.user_data.keys() and (time.time() - self.app.user_data['update'] > 1800):
             self.rates = get_rates()
             self.app.user_data['update'] = int(time.time())
             self.app.user_data['rates'] = self.rates
             self.app.config.set('General', 'user_data', self.app.user_data)
             self.app.config.write()
-            self.timelabel.text = time.strftime("%d.%m.%Y, %H:%M:%S",
+        self.timelabel.text = time.strftime("%d.%m.%Y, %H:%M:%S",
                                                 time.localtime(self.app.user_data['update']))
-        except:
-            self.rates = {}
-            Logger.exception('Cannot get rates from site!')
 
     def calculate(self):
         # self.app =
@@ -53,10 +53,17 @@ class Container(GridLayout):
             self.rates = self.app.user_data['rates']
         else:
             self.update_rates()
-        try:
-            amount1 = float(self.amount1.text)
-        except TypeError:
-            amount1 = 0
+        if re.match(r'.*[+\-*/].*',self.amount1.text):
+            try:
+                amount1 = float(eval(self.amount1.text))
+            except:
+                amount1=0
+        else:
+            try:
+                amount1 = float(self.amount1.text)
+            except ValueError:
+                amount1 = 0
+                Logger.exception('error')
         k = self.rates[self.curr2.text] / self.rates[self.curr1.text]
         if self.curr2.text in ['BTC']:
             fmt = "{:.8f}"
@@ -75,6 +82,13 @@ class Container(GridLayout):
                 self.amount1.text += '.'
         elif value == 'C':
             self.amount1.text = '0'
+        elif value == 'B':
+            if len(self.amount1.text) > 1:
+                self.amount1.text = self.amount1.text[:-1]
+            else:
+                self.amount1.text = '0'
+        elif value == '=':
+            self.amount1.text = str(eval(self.amount1.text.strip('*-+/')))
         else:
             if self.amount1.text == '0':
                 self.amount1.text = ''
@@ -87,10 +101,12 @@ class CurrApp(MDApp):
     title = "Currency calc"
 
     def __init__(self, **kwargs):
-        super(CurrApp, self).__init__(**kwargs)
+
         self.config = ConfigParser()
         self.user_data = {}
-        print(self.config)
+        self.title = "Currency Calculator"
+        self.theme_cls.primary_palette = "Blue"
+        super().__init__(**kwargs)
 
     def build_config(self, config):
         config.adddefaultsection('General')
@@ -99,8 +115,7 @@ class CurrApp(MDApp):
 
     def set_value_from_config(self):
         self.config.read(os.path.join(self.directory, '%(appname)s.ini'))
-        self.user_data = ast.literal_eval(self.config.get(
-            'General', 'user_data'))
+
 
     def get_application_config(self, **kwargs):
         return super(CurrApp, self).get_application_config(
@@ -108,8 +123,7 @@ class CurrApp(MDApp):
 
     def build(self):
         self.theme_man.theme_style = 'Light'
-
-        return Container()
+        return Main()
 
 
 if __name__ == '__main__':

@@ -9,9 +9,15 @@
     valign: 'middle'
     text_size: self.size
 
-<NumButton@MDFillRoundFlatButton>
-    size_hint: .8, .8
-    font_size: '25sp'
+<NumButton@MDRaisedButton>
+    elevation: 10
+    size_hint: 1, 1
+    font_size: '20sp'
+
+<IconButton@MDRaisedButton>
+    font_size: '20sp'
+    size_hint: 1, 1
+    pos_hint: {"center_x": .5}
 <CurSpinner@Spinner>
     font_size: '20sp'
     size_hint: [.4,1]
@@ -19,14 +25,21 @@
     background_normal: ''
     background_color: app.theme_cls.primary_color
 
-<Container>
-    rows: 5
+<Main>
+    rows: 6
 
     amount1:amount1
     amount2:amount2
     curr1:curr1
     curr2:curr2
     timelabel:timelabel
+    MDToolbar:
+        id: toolbar
+        title: app.title
+        md_bg_color: app.theme_cls.primary_color
+        background_palette: "Primary"
+        elevation: 10
+        left_action_items: [["dots-vertical", lambda x: None]]
     AnchorLayout:
         size_hint: [.9,.05]
         MDLabel:
@@ -74,7 +87,7 @@
                 root.calculate()
     GridLayout:
         padding: 30
-        cols: 3
+        cols: 4
         rows: 4
         spacing:10
         NumButton:
@@ -89,6 +102,13 @@
             text: '9'
             on_release:
                 root.input(9)
+
+        NumButton:
+            text: 'C'
+
+            on_release:
+                root.input('C')
+
         NumButton:
             text: '4'
             on_release:
@@ -102,6 +122,13 @@
             on_release:
                 root.input(6)
         NumButton:
+            text: '🔙'
+
+            on_release:
+                root.input('B')
+
+
+        NumButton:
             text: '1'
             on_release:
                 root.input(1)
@@ -113,6 +140,19 @@
             text: '3'
             on_release:
                 root.input(3)
+        BoxLayout:
+            padding:0
+            spacing: 10
+            NumButton:
+                text: '*'
+                on_release:
+                    root.input('*')
+            NumButton:
+                text: '/'
+                on_release:
+                    root.input('/')
+
+
         NumButton:
             text: '0'
             on_release:
@@ -121,7 +161,19 @@
             text: '.'
             on_release:
                 root.input('.')
+
         NumButton:
-            text: 'C'
+            text: '='
             on_release:
-                root.input('C')
+                root.input('=')
+        BoxLayout:
+            padding:0
+            spacing: 10
+            NumButton:
+                text: '+'
+                on_release:
+                    root.input('+')
+            NumButton:
+                text: '-'
+                on_release:
+                    root.input('-')
