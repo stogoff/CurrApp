@@ -1,6 +1,9 @@
+from kivy.lang import Builder
 from kivy.properties import StringProperty, BooleanProperty
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.config import ConfigParser
+from kivy.uix.screenmanager import Screen
 from kivymd.theming import ThemeManager
 from kivymd.app import MDApp
 from kivy.logger import Logger
@@ -10,14 +13,13 @@ import os
 import ast
 import time
 import re
-
 from kivymd.uix.behaviors import RectangularElevationBehavior
 from kivymd.uix.button import BaseFlatIconButton, BaseRectangularButton, BaseRaisedButton, BasePressedButton
-
-os.environ['SSL_CERT_FILE'] = certifi.where()
 # from kivy.core.window import Window
 # Window.size = (480, 853)
-__version__ = '0.3.13'
+__version__ = '0.3.14'
+
+os.environ['SSL_CERT_FILE'] = certifi.where()
 
 
 def get_rates():
@@ -28,7 +30,7 @@ def get_rates():
     return data['rates']
 
 
-class MYRaisedButton(
+class RaisedButton(
     BaseRectangularButton,
     RectangularElevationBehavior,
     BaseRaisedButton,
@@ -37,7 +39,7 @@ class MYRaisedButton(
     pass
 
 
-class MYRaisedIconButton(MYRaisedButton):
+class RaisedIconButton(RaisedButton):
     icon = StringProperty("android")
     """
     Button icon.
@@ -56,15 +58,17 @@ class MYRaisedIconButton(MYRaisedButton):
     button_label = BooleanProperty(False)
 
 
-class Main(GridLayout):
+class ContentNavigationDrawer(BoxLayout):
+    pass
+
+
+class Calculator(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.app = MDApp.get_running_app()
-        self.curr1.text, self.curr2.text = ast.literal_eval(self.app.config.get(
-            'General', 'currencies'))
-        self.app.user_data = ast.literal_eval(self.app.config.get(
-            'General', 'user_data'))
         self.rates = {}
+        self.app = MDApp.get_running_app()
+        self.app.user_data = ast.literal_eval(self.app.config.get('General', 'user_data'))
+        self.curr1.text, self.curr2.text = ast.literal_eval(self.app.config.get('General', 'currencies'))
         self.update_rates()
 
     def update_rates(self):
@@ -140,6 +144,7 @@ class CurrApp(MDApp):
         self.config = ConfigParser()
         self.user_data = {}
         self.title = "Currency Calculator"
+        self.version = __version__
         self.theme_cls.primary_palette = "Blue"
         super().__init__(**kwargs)
 
@@ -157,7 +162,8 @@ class CurrApp(MDApp):
 
     def build(self):
         self.theme_man.theme_style = 'Light'
-        return Main()
+        return Calculator()
+
 
 
 if __name__ == '__main__':
