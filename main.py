@@ -1,23 +1,29 @@
-from kivy.lang import Builder
-from kivy.properties import StringProperty, BooleanProperty
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.config import ConfigParser
-from kivy.uix.screenmanager import Screen
-from kivymd.theming import ThemeManager
-from kivymd.app import MDApp
-from kivy.logger import Logger
-import requests
-import certifi
-import os
 import ast
-import time
+import os
 import re
+import sys
+import time
+
+import certifi
+import requests
+from kivy.clock import Clock
+from kivy.config import ConfigParser
+from kivy.logger import Logger
+from kivy.properties import BooleanProperty
+from kivy.properties import StringProperty
+from kivy.uix.boxlayout import BoxLayout
+from kivy.utils import get_hex_from_color
+from kivymd.app import MDApp
+from kivymd.theming import ThemeManager
+from kivymd.toast import toast
 from kivymd.uix.behaviors import RectangularElevationBehavior
-from kivymd.uix.button import BaseFlatIconButton, BaseRectangularButton, BaseRaisedButton, BasePressedButton
+from kivymd.uix.button import BaseRectangularButton, BaseRaisedButton, BasePressedButton
+
 # from kivy.core.window import Window
 # Window.size = (480, 853)
-__version__ = '0.3.14'
+__version__ = '0.3.15'
+
+from kivymd.uix.navigationdrawer import NavigationLayout
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
 
@@ -62,12 +68,13 @@ class ContentNavigationDrawer(BoxLayout):
     pass
 
 
-class Calculator(Screen):
+class Calculator(NavigationLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.rates = {}
         self.app = MDApp.get_running_app()
         self.app.user_data = ast.literal_eval(self.app.config.get('General', 'user_data'))
+        self.app.main_screen = self
         self.curr1.text, self.curr2.text = ast.literal_eval(self.app.config.get('General', 'currencies'))
         self.update_rates()
 
@@ -135,7 +142,6 @@ class Calculator(Screen):
         self.calculate()
 
 
-
 class CurrApp(MDApp):
     theme_man = ThemeManager()
     title = "Currency calc"
@@ -143,6 +149,12 @@ class CurrApp(MDApp):
     def __init__(self, **kwargs):
         self.config = ConfigParser()
         self.user_data = {}
+        self.manager = None
+        self.nav_drawer = None
+        self.main_screen = None
+        self.start_screen = None
+        self.exit_interval = False
+        self.list_previous_screens = ['main']
         self.title = "Currency Calculator"
         self.version = __version__
         self.theme_cls.primary_palette = "Blue"
@@ -160,10 +172,74 @@ class CurrApp(MDApp):
         return super(CurrApp, self).get_application_config(
             '{}/%(appname)s.ini'.format(self.directory))
 
+    def events_program(self, instance, keyboard, keycode, text, modifiers):
+        if keyboard in (1001, 27):
+            if self.nav_drawer.state == 'open':
+                self.nav_drawer.toggle_nav_drawer()
+            self.back_screen(event=keyboard)
+        elif keyboard in (282, 319):
+            pass
+
+        return True
+
+    def back_screen(self, event=None):
+        if event in (1001, 27):
+            if self.manager.current == 'main':
+                self.dialog_exit()
+                return
+            try:
+                self.manager.current = self.list_previous_screens.pop()
+            except:
+                self.manager.current = 'main'
+            self.start_screen.ids.toolbar.title = self.title
+            self.start_screen.ids.toolbar.left_action_items = \
+                [['menu', lambda x: self.nav_drawer.toggle_nav_drawer()]]
+
+    def show_license(self, *args):
+        pass
+
+    def show_about(self, *args):
+        self.nav_drawer.toggle_nav_drawer()
+        self.start_screen.ids.about_label.text = (
+                u'[size=20][b]Currency Calculator [/b][/size]\n\n' +
+                u'[b]Version:[/b] {version}\n' +
+                u'[b]License:[/b] MIT\n\n' +
+                u'[size=20][b]Developer[/b][/size]\n\n' +
+                u'[ref=SITE_PROJECT]' +
+                u'[color={link_color}]Rost[/color][/ref]\n\n' +
+                u'[b]Source code:[/b] ' +
+                u'[ref=https://github.com/stogoff/CurrCalcApp]' +
+                u'[color={link_color}]GitHub[/color][/ref]').format(
+            version=__version__,
+            link_color=get_hex_from_color(self.theme_cls.primary_color)
+        )
+        self.manager.current = 'about'
+        self.start_screen.ids.toolbar.left_action_items = \
+            [['chevron-left', lambda x: self.back_screen(27)]]
+        pass
+
+    def select_locale(self, *args):
+        pass
+
+    def dialog_exit(self):
+        def check_interval_press(interval):
+            self.exit_interval += interval
+            if self.exit_interval > 5:
+                self.exit_interval = False
+                Clock.unschedule(check_interval_press)
+
+        if self.exit_interval:
+            sys.exit(0)
+
+        Clock.schedule_interval(check_interval_press, 1)
+        toast('Press Back to Exit')
+
     def build(self):
         self.theme_man.theme_style = 'Light'
-        return Calculator()
-
+        self.start_screen = Calculator()
+        self.manager = self.start_screen.ids.s_manager
+        self.nav_drawer = self.start_screen.ids.nav_drawer
+        return self.start_screen
 
 
 if __name__ == '__main__':
