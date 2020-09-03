@@ -17,7 +17,7 @@ from kivymd.uix.button import BaseFlatIconButton, BaseRectangularButton, BaseRai
 os.environ['SSL_CERT_FILE'] = certifi.where()
 # from kivy.core.window import Window
 # Window.size = (480, 853)
-__version__ = '0.3.10'
+__version__ = '0.3.13'
 
 
 def get_rates():
@@ -26,8 +26,6 @@ def get_rates():
     Logger.info('response status code: {}'.format(response.status_code))
     data = response.json()
     return data['rates']
-
-
 
 
 class MYRaisedButton(
@@ -127,6 +125,8 @@ class Main(GridLayout):
         else:
             if self.amount1.text == '0':
                 self.amount1.text = ''
+                if str(value) in "*-/+":
+                    value = '0'
             self.amount1.text += str(value)
         self.calculate()
 

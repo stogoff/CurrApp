@@ -13,12 +13,10 @@
     md_bg_color: root.theme_cls.primary_color
     theme_text_color: 'Custom'
     text_color: root.specific_text_color
+    elevation_normal: 10
+    size_hint: 1, 1
 
 <MYRaisedIconButton>
-    md_bg_color: root.theme_cls.primary_color
-    theme_text_color: 'Custom'
-    text_color: root.specific_text_color
-    elevation_normal: 10
     MDIcon:
         id: lbl_ic
         icon: root.icon
@@ -33,22 +31,17 @@
     text_size: self.size
 
 <NumButton@MYRaisedButton>
-    elevation: 10
-    size_hint: 1, 1
     font_size: '20sp'
-
-<IconButton@MYRaisedIconButton>
-    size_hint: 1, 1
 
 <CurSpinner@Spinner>
     font_size: '20sp'
-    size_hint: [.4,1]
+    size_hint: [.31,1]
     values:'USD','EUR','GBP','RUB','CHF','CAD','JPY','BTC'
     background_normal: ''
     background_color: app.theme_cls.primary_color
 
 <Main>
-    rows: 5
+    rows: 6
     amount1:amount1
     amount2:amount2
     curr1:curr1
@@ -56,13 +49,14 @@
     timelabel:timelabel
     rate1:rate1
     rate2:rate2
-    #MDToolbar:
-    #    id: toolbar
-    #    title: app.title
-    #    md_bg_color: app.theme_cls.primary_color
-    #    background_palette: "Primary"
-    #    elevation: 10
-    #    left_action_items: [["dots-vertical", lambda x: None]]
+    toolbar:toolbar
+    MDToolbar:
+        id: toolbar
+        title: app.title
+        md_bg_color: app.theme_cls.primary_color
+        background_palette: "Primary"
+        elevation: 10
+        left_action_items: [["dots-vertical", lambda x: None]]
     AnchorLayout:
         size_hint: [.9,.05]
         MDLabel:
@@ -72,7 +66,7 @@
     BoxLayout:
         size_hint: [.9,.2]
         padding: [30,30,30,0]
-        spacing:5
+        spacing:20
         ItemLabel:
             id:amount1
             text:'0'
@@ -90,7 +84,7 @@
             text:'='
             halign: 'right'
         MDIconButton:
-            size_hint: [.4,1]
+            size_hint: [.31,1]
             icon: 'arrow-up-down-bold-outline'
             halign: 'center'
             on_release:
@@ -98,7 +92,7 @@
     BoxLayout:
         size_hint: [.9,.2]
         padding: [30,0,30,30]
-        spacing:5
+        spacing:20
         ItemLabel:
             id:amount2
             text:'0'
@@ -112,21 +106,17 @@
         padding: 30
         cols: 4
         rows: 5
-        spacing:10
+        spacing:20
         RateLabel:
             id:rate1
         RateLabel:
             id:rate2
         NumButton:
             text: 'C'
-
             on_release:
                 root.input('C')
-        IconButton:
-            #text: '🔙'
-            #font_name: 'NotoEmoji-Regular.ttf'
+        MYRaisedIconButton:
             icon: 'backspace'
-
             on_release:
                 root.input('B')
 
@@ -147,7 +137,6 @@
             on_release:
                 root.input('*')
 
-
         NumButton:
             text: '4'
             on_release:
@@ -164,8 +153,6 @@
             text: '/'
             on_release:
                 root.input('/')
-
-
 
         NumButton:
             text: '1'
@@ -184,9 +171,6 @@
             on_release:
                 root.input('+')
 
-
-
-
         NumButton:
             text: '0'
             on_release:
@@ -195,12 +179,10 @@
             text: '.'
             on_release:
                 root.input('.')
-
         NumButton:
             text: '='
             on_release:
                 root.input('=')
-
         NumButton:
             text: '-'
             on_release:
