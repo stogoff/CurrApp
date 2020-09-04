@@ -21,12 +21,12 @@ from kivymd.uix.button import BaseRectangularButton, BaseRaisedButton, BasePress
 
 # from kivy.core.window import Window
 # Window.size = (480, 853)
-__version__ = '0.3.17'
+__version__ = '0.3.18'
 
 from kivymd.uix.navigationdrawer import NavigationLayout
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
-
+CRYPTO = ['BTC',]
 
 def get_rates():
     url = 'https://openexchangerates.org/api/latest.json?app_id=43d720b184b24b0d8157da339f12f17c'
@@ -95,10 +95,10 @@ class Calculator(NavigationLayout):
         s1 = self.curr1.text
         s2 = self.curr2.text
         k = self.rates[s2] / self.rates[s1]
-        if s1 in ['BTC',]:
+        if s1 in CRYPTO:
             fmt1 = "{}/{}:\n{:.2f}"
             fmt2 = "{}/{}:\n[size=15sp]{:.8f}[/size]"
-        elif s2 in ['BTC',]:
+        elif s2 in CRYPTO:
             fmt1 = "{}/{}:\n[size=15sp]{:.8f}[/size]"
             fmt2 = "{}/{}:\n{:.2f}"
         else:
@@ -113,7 +113,9 @@ class Calculator(NavigationLayout):
         if am1_txt == '0':
             self.amount2.text = '0'
         else:
-            if re.match(r'.*[+\-*/].*', am1_txt):
+            if am1_txt[-1] in "*-/+":
+                am1_txt = am1_txt[:-1]
+            if re.match(r'.*[+\-*/]+.*', am1_txt):
                 try:
                     amount1 = float(eval(am1_txt))
                 except:
@@ -125,7 +127,7 @@ class Calculator(NavigationLayout):
                     amount1 = 0
                     Logger.exception('error')
             k = self.rates[s2] / self.rates[s1]
-            if s2 in ['BTC']:
+            if s2 in CRYPTO:
                 fmt = "{:.8f}"
             else:
                 fmt = "{:.2f}"
@@ -148,12 +150,24 @@ class Calculator(NavigationLayout):
             else:
                 self.amount1.text = '0'
         elif value == '=':
-            self.amount1.text = str(eval(self.amount1.text.strip('*-+/')))
+            try:
+                if self.curr1.text in CRYPTO:
+                    fmt = '{:.8f}'
+                else:
+                    fmt = '{:.2f}'
+                self.amount1.text = fmt.format(eval(self.amount1.text.strip('*-+/'))).rstrip('0').rstrip('.')
+            except:
+                self.amount1.text = '0'
+        elif str(value) in "*-/+":
+            if self.amount1.text == '0':
+                pass
+            else:
+                if self.amount1.text[-1] not in "*-/+":
+                    self.amount1.text += str(value)
         else:
             if self.amount1.text == '0':
                 self.amount1.text = ''
-                if str(value) in "*-/+":
-                    value = '0'
+
             self.amount1.text += str(value)
         self.calculate()
 
