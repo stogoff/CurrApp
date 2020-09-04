@@ -21,7 +21,7 @@ from kivymd.uix.button import BaseRectangularButton, BaseRaisedButton, BasePress
 
 # from kivy.core.window import Window
 # Window.size = (480, 853)
-__version__ = '0.3.15'
+__version__ = '0.3.17'
 
 from kivymd.uix.navigationdrawer import NavigationLayout
 
@@ -89,32 +89,48 @@ class Calculator(NavigationLayout):
             self.rates = self.app.user_data['rates']
         self.timelabel.text = time.strftime("rates updated: %d.%m.%Y, %H:%M:%S",
                                             time.localtime(self.app.user_data['update']))
-        k = self.rates[self.curr2.text] / self.rates[self.curr1.text]
-        self.rate1.text = "{}/{}:\n{:.4f}".format(self.curr1.text, self.curr2.text, k)
+        self.show_pairs()
 
-        self.rate2.text = "{}/{}:\n{:.4f}".format(self.curr2.text, self.curr1.text, 1 / k)
+    def show_pairs(self):
+        s1 = self.curr1.text
+        s2 = self.curr2.text
+        k = self.rates[s2] / self.rates[s1]
+        if s1 in ['BTC',]:
+            fmt1 = "{}/{}:\n{:.2f}"
+            fmt2 = "{}/{}:\n[size=15sp]{:.8f}[/size]"
+        elif s2 in ['BTC',]:
+            fmt1 = "{}/{}:\n[size=15sp]{:.8f}[/size]"
+            fmt2 = "{}/{}:\n{:.2f}"
+        else:
+            fmt1 = fmt2 = "{}/{}:\n{:.4f}"
+        self.rate1.text = fmt1.format(self.curr1.text, self.curr2.text, k)
+        self.rate2.text = fmt2.format(self.curr2.text, self.curr1.text, 1 / k)
 
     def calculate(self):
         self.update_rates()
-
-        if re.match(r'.*[+\-*/].*', self.amount1.text):
-            try:
-                amount1 = float(eval(self.amount1.text))
-            except:
-                amount1 = 0
+        am1_txt = self.amount1.text
+        s1, s2 = self.curr1.text, self.curr2.text
+        if am1_txt == '0':
+            self.amount2.text = '0'
         else:
-            try:
-                amount1 = float(self.amount1.text)
-            except ValueError:
-                amount1 = 0
-                Logger.exception('error')
-        k = self.rates[self.curr2.text] / self.rates[self.curr1.text]
-        if self.curr2.text in ['BTC']:
-            fmt = "{:.8f}"
-        else:
-            fmt = "{:.2f}"
-        self.amount2.text = fmt.format(amount1 * k)
-        self.app.config.set('General', 'currencies', [self.curr1.text, self.curr2.text])
+            if re.match(r'.*[+\-*/].*', am1_txt):
+                try:
+                    amount1 = float(eval(am1_txt))
+                except:
+                    amount1 = 0
+            else:
+                try:
+                    amount1 = float(am1_txt)
+                except ValueError:
+                    amount1 = 0
+                    Logger.exception('error')
+            k = self.rates[s2] / self.rates[s1]
+            if s2 in ['BTC']:
+                fmt = "{:.8f}"
+            else:
+                fmt = "{:.2f}"
+            self.amount2.text = fmt.format(amount1 * k)
+        self.app.config.set('General', 'currencies', [s1, s2])
         self.app.config.write()
 
     def swap_currencies(self):
@@ -175,7 +191,7 @@ class CurrApp(MDApp):
     def events_program(self, instance, keyboard, keycode, text, modifiers):
         if keyboard in (1001, 27):
             if self.nav_drawer.state == 'open':
-                self.nav_drawer.toggle_nav_drawer()
+                self.nav_drawer.set_state()
             self.back_screen(event=keyboard)
         elif keyboard in (282, 319):
             pass
@@ -193,32 +209,46 @@ class CurrApp(MDApp):
                 self.manager.current = 'main'
             self.start_screen.ids.toolbar.title = self.title
             self.start_screen.ids.toolbar.left_action_items = \
-                [['menu', lambda x: self.nav_drawer.toggle_nav_drawer()]]
+                [['menu', lambda x: self.nav_drawer.set_state()]]
 
     def show_license(self, *args):
-        pass
+        self.nav_drawer.set_state()
+
+        self.start_screen.ids.text_license.text = ('%s') % open(
+                    os.path.join(self.directory, 'LICENSE'), encoding='utf-8').read()
+
+        self.manager.current = 'license'
+        self.start_screen.ids.toolbar.left_action_items = \
+            [['chevron-left', lambda x: self.back_screen(27)]]
+        self.start_screen.ids.toolbar.title = 'MIT LICENSE'
 
     def show_about(self, *args):
-        self.nav_drawer.toggle_nav_drawer()
+        Logger.info('enter show_about')
+        self.nav_drawer.set_state()
+        Logger.info('enter state')
         self.start_screen.ids.about_label.text = (
-                u'[size=20][b]Currency Calculator [/b][/size]\n\n' +
+                u'[size=50][b]Currency Calculator [/b][/size]\n\n' +
                 u'[b]Version:[/b] {version}\n' +
                 u'[b]License:[/b] MIT\n\n' +
-                u'[size=20][b]Developer[/b][/size]\n\n' +
+                u'[size=40][b]Developer[/b][/size]\n\n' +
                 u'[ref=SITE_PROJECT]' +
                 u'[color={link_color}]Rost[/color][/ref]\n\n' +
-                u'[b]Source code:[/b] ' +
-                u'[ref=https://github.com/stogoff/CurrCalcApp]' +
-                u'[color={link_color}]GitHub[/color][/ref]').format(
+                #u'[b]Source code:[/b] ' +
+                #u'[ref=https://github.com/stogoff/CurrApp]' +
+                #u'[color={link_color}]GitHub[/color][/ref]'+
+                '').format(
             version=__version__,
             link_color=get_hex_from_color(self.theme_cls.primary_color)
         )
+        Logger.info(' text')
         self.manager.current = 'about'
+        Logger.info('set current')
         self.start_screen.ids.toolbar.left_action_items = \
             [['chevron-left', lambda x: self.back_screen(27)]]
-        pass
+        Logger.info('last command')
 
-    def select_locale(self, *args):
+
+    def select_locale(self, *args): # TODO
         pass
 
     def dialog_exit(self):
@@ -239,6 +269,10 @@ class CurrApp(MDApp):
         self.start_screen = Calculator()
         self.manager = self.start_screen.ids.s_manager
         self.nav_drawer = self.start_screen.ids.nav_drawer
+        # temporary disabled
+        #self.start_screen.ids.lic_label.disabled = True
+        self.start_screen.ids.lang_label.disabled = True
+
         return self.start_screen
 
 

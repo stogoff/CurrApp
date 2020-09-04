@@ -37,6 +37,7 @@
     halign: 'center'
     valign: 'middle'
     text_size: self.size
+    markup: True
 
 <NumButton@RaisedButton>
     font_size: '20sp'
@@ -64,7 +65,7 @@
         id: toolbar
         background_color: app.theme_cls.primary_color
         title: app.title
-        left_action_items: [['menu', lambda x: nav_drawer.toggle_nav_drawer()]]
+        left_action_items: [['menu', lambda x: nav_drawer.set_state()]]
         elevation: 10
         md_bg_color: app.theme_cls.primary_color
         pos_hint: {"top": 1}
@@ -244,6 +245,40 @@
                     Widget:
                     Widget:
 
+        Screen:
+            id:license
+            name: 'license'
+
+            BoxLayout:
+                orientation: 'vertical'
+                padding: dp(10), dp(10)
+                spacing: dp(10)
+
+                Label:
+                    size_hint: None, None
+                    height: dp(20)
+                    width: self.texture_size[0]
+                    halign: 'left'
+                    color: app.theme_cls.primary_color
+                    font_size: '18sp'
+                    text: 'MIT LICENSE'
+
+                MDSeparator:
+
+                Image:
+                    source: 'data/open-source-logo.png'
+                    size_hint_y: 0.4
+
+                ScrollView:
+
+                    Label:
+                        id: text_license
+                        font_size: '13sp'
+                        text_size: self.width, None
+                        size_hint_y: None
+                        markup: True
+                        height: self.texture_size[1]
+
     MDNavigationDrawer:
         id: nav_drawer
         ContentNavigationDrawer:
@@ -294,12 +329,13 @@
                         events_callback: lambda x: x
 
                     SingleIconItem:
+                        id:lang_label
                         icon: 'web'
                         text: 'Language'
-
                         events_callback: app.select_locale
 
                     SingleIconItem:
+                        id:lic_label
                         icon: 'language-python'
                         text: 'License'
                         events_callback: app.show_license

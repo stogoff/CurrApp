@@ -1,0 +1,8 @@
+kivy==2.0.0rc1
+kivymd==0.104.1
+certifi
+requests
+urllib3
+chardet
+idna
+Cython
