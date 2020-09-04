@@ -36,7 +36,7 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==1.11.1,kivymd==0.104.1,openssl,certifi,requests,urllib3,chardet,idna
+requirements = python3,kivy==2.0.0rc1,kivymd==0.104.1,openssl,certifi,requests,urllib3,chardet,idna
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -221,6 +221,7 @@ android.accept_sdk_license = True
 
 # (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
 android.arch = arm64-v8a
+#arm64-v8a
 #armeabi-v7a
 
 # (int) overrides automatic versionCode computation (used in build.gradle)
