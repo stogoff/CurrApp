@@ -7,7 +7,7 @@ CUR = ['USD', 'EUR', 'GBP', 'RUB', 'CHF', 'CAD', 'JPY', 'BTC']
 
 def get_rates():
     url = 'https://openexchangerates.org/api/latest.json?app_id=43d720b184b24b0d8157da339f12f17c'
-    outfilename = '/var/www/gba.ee/data.json''data.json' #'data.json'
+    outfilename = '/var/www/gba.ee/data.json' # 'data.json'
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
