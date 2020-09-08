@@ -21,7 +21,9 @@ from kivymd.uix.button import BaseRectangularButton, BaseRaisedButton, BasePress
 
 # from kivy.core.window import Window
 # Window.size = (480, 853)
-__version__ = '0.3.18'
+__version__ = '0.3.19'
+
+
 
 from kivymd.uix.navigationdrawer import NavigationLayout
 
@@ -29,11 +31,11 @@ os.environ['SSL_CERT_FILE'] = certifi.where()
 CRYPTO = ['BTC',]
 
 def get_rates():
-    url = 'https://openexchangerates.org/api/latest.json?app_id=43d720b184b24b0d8157da339f12f17c'
+    url = 'https://gba.ee/data.json'
     response = requests.get(url)
     Logger.info('response status code: {}'.format(response.status_code))
     data = response.json()
-    return data['rates']
+    return data
 
 
 class RaisedButton(

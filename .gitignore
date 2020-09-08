@@ -1,6 +1,7 @@
 .buildozer/*
 .buildozer
 bin
+secret
 *.log
 *.ini
 .coverage
