@@ -90,7 +90,7 @@ class Calculator(NavigationLayout):
         else:
             self.rates = self.app.user_data['rates']
         self.timelabel.text = time.strftime("rates updated: %d.%m.%Y, %H:%M:%S",
-                                            time.localtime(self.app.user_data['update']))
+                                            time.localtime(self.rates['time']))
         self.show_pairs()
 
     def show_pairs(self):
