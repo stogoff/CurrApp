@@ -10,11 +10,11 @@ def get_rates():
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
-        print(data)
+        #print(data)
         data1 = {k: data['rates'][k] for k in CUR}
         with open('/var/www/gba.ee/data.json', 'w') as outfile:
             json.dump(data1, outfile)
-    return data1
+
 
 
 if __name__ == '__main__':
