@@ -2,7 +2,7 @@ import json
 
 import requests
 
-CUR = ['USD', 'EUR', 'GBP', 'RUB', 'CHF', 'CAD', 'JPY', 'BTC']
+CUR = ['USD', 'EUR', 'GBP', 'RUB', 'CHF', 'CAD', 'AMD', 'JPY', 'BTC']
 
 
 def get_rates():
